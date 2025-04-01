@@ -27,13 +27,16 @@ const schema = yup
   .required();
 
 
-export default function AddIngredientForm({ onClose, onSubmit, ingredient }) {
+export default function EditIngredientForm({ onClose, onSubmit, ingredient }) {
   const defaultValues = {
     name: ingredient.name,
     amount: ingredient.amount,
     unit: ingredient.unit,
     price_per_kg: ingredient.price_per_kg
   };
+
+  console.log("default vlaues", defaultValues);
+  console.log("ingr", ingredient);
 
   const { control, handleSubmit, formState: { errors } } = useForm({
     resolver: yupResolver(schema),

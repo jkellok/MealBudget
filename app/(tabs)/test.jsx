@@ -6,9 +6,6 @@ import Button from "../../components/Button";
 import ImageViewer from "../../components/ImageViewer";
 import IconButton from "../../components/IconButton";
 import CircleButton from "../../components/CircleButton";
-import EmojiPicker from "../../components/EmojiPicker";
-import EmojiList from "../../components/EmojiList";
-import EmojiSticker from "../../components/EmojiSticker";
 
 const PlaceholderImage = require("@/assets/images/react-logo.png");
 
@@ -53,7 +50,6 @@ const IngredientTest = () => {
     <View style={styles.container}>
       <View style={styles.imageContainer}>
         <ImageViewer imgSource={PlaceholderImage} selectedImage={selectedImage} />
-        {pickedEmoji && <EmojiSticker imageSize={40} stickerSource={pickedEmoji} />}
       </View>
       {showAppOptions ? (
         <View style={styles.optionsContainer}>
@@ -69,9 +65,6 @@ const IngredientTest = () => {
           <Button label="Use this photo" onPress={() => setShowAppOptions(true)} />
         </View>
       )}
-      <EmojiPicker isVisible={isModalVisible} onClose={onModalClose}>
-        <EmojiList onSelect={setPickedEmoji} onCloseModal={onModalClose} />
-      </EmojiPicker>
     </View>
   );
 };

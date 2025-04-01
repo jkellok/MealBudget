@@ -7,7 +7,7 @@ export default function IngredientListItem({ item }) {
       <Text style={styles.title}>
         {name}
       </Text>
-      <Text style={styles.text}>{amount} {unit}</Text>
+      <Text style={styles.text}>{parseFloat(amount)} {unit}</Text>
       <Text style={styles.text}>{price_per_kg} €/kg</Text>
     </View>
   );

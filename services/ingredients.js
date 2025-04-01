@@ -8,7 +8,6 @@ const getAllIngredients = async () => {
   return data;
 };
 
-// not implemented yet vvvvv
 const getIngredient = async (id) => {
   const { data } = await axios.get(`${apiBaseUrl}/pantry/${id}`);
   return data;
@@ -24,11 +23,8 @@ const createNewIngredient = async (object) => {
   //}
 };
 
-// prob id here and updatedObject
 const updateIngredient = async (object, id) => {
-  console.log("object", object);
   const { data } = await axios.put(`${apiBaseUrl}/pantry/${id}`, object);
-  console.log("data returned", data);
   return data;
 };
 

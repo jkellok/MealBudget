@@ -10,7 +10,7 @@ const IngredientDetails = ({ ingredient }) => {
   return (
     <View style={styles.ingredientContainer}>
       <Text style={styles.detailText}>Name: {ingredient.name}</Text>
-      <Text style={styles.detailText}>Amount: {ingredient.amount} {ingredient.unit}</Text>
+      <Text style={styles.detailText}>Amount: {parseFloat(ingredient.amount)} {ingredient.unit}</Text>
       <Text style={styles.detailText}>Price per kg: {ingredient.price_per_kg} €/kg</Text>
       <Text>More details to come...</Text>
     </View>

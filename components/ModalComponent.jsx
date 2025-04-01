@@ -1,4 +1,4 @@
-import { Modal, View, Text, Pressable, StyleSheet, Dimensions } from "react-native";
+import { Modal, View, Text, Pressable, StyleSheet, Dimensions, ScrollView } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 export default function ModalComponent({ isVisible, children, onClose, title }) {
@@ -12,9 +12,9 @@ export default function ModalComponent({ isVisible, children, onClose, title }) 
               <MaterialIcons name="close" color="#fff" size={22} />
             </Pressable>
           </View>
-          <View style={styles.modalChildrenContent}>
+          <ScrollView style={styles.modalChildrenContent}>
             {children}
-          </View>
+          </ScrollView>
         </View>
       </Modal>
     </View>
@@ -23,13 +23,12 @@ export default function ModalComponent({ isVisible, children, onClose, title }) 
 
 const styles = StyleSheet.create({
   modalContent: {
-    //height: "25%",
-    //width: "100%",
     backgroundColor: "#eee",
     borderRadius: 18,
     alignSelf: "center",
-    width: Dimensions.get("window").width * 0.8,
-    height: Dimensions.get("window").height * 0.8,
+    width: Dimensions.get("window").width * 0.85,
+    height: Dimensions.get("window").height * 0.9,
+    paddingBottom: 8,
   },
   titleContainer: {
     height: "8%",
@@ -46,9 +45,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   modalContainer: {
-
   },
   modalChildrenContent: {
-
   },
 });

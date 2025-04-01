@@ -1,9 +1,10 @@
-import { Text, View, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
+import RecipePage from "../../../../components/RecipePage";
 
 export default function RecipeScreen() {
   return (
     <View style={styles.container}>
-      <Text>One recipe shown here</Text>
+      <RecipePage />
     </View>
   );
 }

@@ -1,18 +1,57 @@
 import { useEffect, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, FlatList } from "react-native";
 import ingredientService from "../../services/ingredients";
+import linkedIngredientService from "../../services/linked_ingredients";
 import ModalComponent from "../ModalComponent";
-import { router, Stack, useLocalSearchParams } from "expo-router";
+import { router, Stack, useLocalSearchParams, Link } from "expo-router";
 import Button from "../Button";
 import EditIngredientForm from "./EditIngredientForm";
+import RecipeListItem from "../RecipesPage/RecipeListItem";
 
 const IngredientDetails = ({ ingredient }) => {
   return (
-    <View style={styles.ingredientContainer}>
+    <View style={styles.textContainer}>
       <Text style={styles.detailText}>Name: {ingredient.name}</Text>
       <Text style={styles.detailText}>Amount: {parseFloat(ingredient.amount)} {ingredient.unit}</Text>
       <Text style={styles.detailText}>Price per kg: {ingredient.price_per_kg} €/kg</Text>
       <Text>More details to come...</Text>
+    </View>
+  );
+};
+
+const LinkedRecipes = ({ linkedRecipes }) => {
+  const renderRecipeTitle = ({ item }) => (
+    <View>
+      <Link
+        href={{
+          pathname: "recipes/recipe/[id]",
+          params: { id: item.recipe_id },
+        }}>
+        <Text>{"\u2022 "}<Text style={styles.linkText}>{item.title}</Text></Text>
+      </Link>
+    </View>
+  );
+
+  // if want to show image or possibly other details instead
+  const renderItem = ({ item }) => (
+    <View style={styles.listItemContainer}>
+      <Link
+        href={{
+          pathname: "recipes/recipe/[id]",
+          params: { id: item.recipe_id },
+        }}>
+        <RecipeListItem item={item} />
+      </Link>
+    </View>
+  );
+
+  return (
+    <View style={styles.textContainer}>
+      <Text>This ingredient is used in recipes:</Text>
+      <FlatList
+        data={linkedRecipes}
+        renderItem={renderRecipeTitle}
+      />
     </View>
   );
 };
@@ -22,21 +61,26 @@ export default function IngredientPage() {
   const [ingredient, setIngredient] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [error, setError] = useState(null);
+  const [linkedRecipes, setLinkedRecipes] = useState([]);
 
   const getIngredient = async (id) => {
     const ingredient = await ingredientService.getIngredient(id);
     setIngredient(ingredient);
   };
 
+  const getLinkedRecipes = async (id) => {
+    const linkedRecipes = await linkedIngredientService.getLinkedRecipesByIngredient(id);
+    setLinkedRecipes(linkedRecipes);
+  };
+
   useEffect(() => {
     getIngredient(id);
+    getLinkedRecipes(id);
   }, [id]);
 
-  const onDelete = () => {
+  const onDelete = async () => {
     try {
-      ingredientService.deleteIngredient(id);
-      // maybe could wait a little bit or make it slower
-      // to ensure deletion happens first before pantry makes get req
+      await ingredientService.deleteIngredient(id);
       router.back();
     } catch (err) {
       console.error(err);
@@ -54,7 +98,7 @@ export default function IngredientPage() {
 
   const submitUpdatedIngredient = async (values) => {
     try {
-      const updatedIngredient = await ingredientService.updateIngredient(values, ingredient.id);
+      const updatedIngredient = await ingredientService.updateIngredient(values, ingredient.ingredient_id);
       setIngredient(updatedIngredient);
       onModalClose();
     } catch (err) {
@@ -73,6 +117,7 @@ export default function IngredientPage() {
       />
       {error && <Text style={styles.errorText}>{error}</Text>}
       <IngredientDetails ingredient={ingredient} />
+      {linkedRecipes.length > 0 && <LinkedRecipes linkedRecipes={linkedRecipes} />}
       <View style={styles.buttonContainer}>
         <Button label="Edit" onPress={onUpdateIngredient} theme="primary-icon" icon="edit" />
         <Button label="Delete" onPress={onDelete} theme="secondary-icon" icon="delete" />
@@ -101,7 +146,7 @@ const styles = StyleSheet.create({
     bottom: 30,
     alignSelf: "center",
   },
-  ingredientContainer: {
+  textContainer: {
     padding: 10,
   },
   detailText: {
@@ -109,4 +154,9 @@ const styles = StyleSheet.create({
     //textAlign: "center"
     userSelect: "auto"
   },
+  linkText: {
+    fontSize: 18,
+    color: "blue",
+    textDecorationLine: "underline",
+  }
 });

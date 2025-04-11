@@ -35,15 +35,12 @@ export default function EditIngredientForm({ onClose, onSubmit, ingredient }) {
     price_per_kg: ingredient.price_per_kg
   };
 
-  console.log("default vlaues", defaultValues);
-  console.log("ingr", ingredient);
-
   const { control, handleSubmit, formState: { errors } } = useForm({
     resolver: yupResolver(schema),
   });
 
   const onHandleSubmit = (data) => {
-    console.log(data);
+    console.log("Submitting:", data);
     // change to only submit changed data later
     onSubmit(data);
   };

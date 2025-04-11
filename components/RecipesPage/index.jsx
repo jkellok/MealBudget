@@ -39,7 +39,7 @@ export default function RecipesPage() {
       <Link
         href={{
           pathname: "recipes/recipe/[id]",
-          params: { id: item.id },
+          params: { id: item.recipe_id },
         }}>
         <RecipeListItem item={item} />
       </Link>
@@ -73,7 +73,7 @@ export default function RecipesPage() {
         showsVerticalScrollIndicator={true}
         data={recipes}
         contentContainerStyle={styles.listContainer}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.recipe_id}
         renderItem={renderItem}
         onRefresh={onRefresh}
         refreshing={isFetching}
@@ -83,7 +83,7 @@ export default function RecipesPage() {
         <AddButton onPress={onAddRecipe} />
       </View>
       <ModalComponent isVisible={isModalVisible} onClose={onModalClose} title="Add recipe">
-          <AddRecipeForm onClose={onModalClose} onSubmit={submitNewRecipe} />
+        <AddRecipeForm onClose={onModalClose} onSubmit={submitNewRecipe} />
       </ModalComponent>
     </View>
   );
@@ -128,5 +128,6 @@ const styles = StyleSheet.create({
   container: {
     //height: Dimensions.get("window").height * 0.8,
     //width: Dimensions.get("window").width * 0.8,
+    //flex: 1,
   }
 });

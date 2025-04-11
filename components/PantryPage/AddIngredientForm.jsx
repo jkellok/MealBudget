@@ -39,7 +39,7 @@ export default function AddIngredientForm({ onClose, onSubmit }) {
   });
 
   const onHandleSubmit = (data) => {
-    console.log(data);
+    console.log("Submitting:", data);
     onSubmit(data);
   };
 

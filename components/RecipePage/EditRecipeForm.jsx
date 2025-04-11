@@ -30,15 +30,12 @@ const schema = yup
   .required();
 
 export default function EditRecipeForm({ onClose, onSubmit, recipe }) {
-  console.log("recipe", recipe);
   const defaultValues = {
     title: recipe.title,
     servings: recipe.servings,
     ingredients: recipe.ingredients,
     instructions: recipe.instructions
   };
-
-  console.log("default values", defaultValues);
 
   const { control, handleSubmit, formState: { errors } } = useForm({
     // form validation debug
@@ -65,7 +62,7 @@ export default function EditRecipeForm({ onClose, onSubmit, recipe }) {
   });
 
   const onHandleSubmit = (data) => {
-    console.log(data);
+    console.log("Submitting:", data);
     onSubmit(data);
   };
 
@@ -97,7 +94,7 @@ export default function EditRecipeForm({ onClose, onSubmit, recipe }) {
               placeholder="Servings*"
               onBlur={onBlur}
               onChangeText={onChange}
-              value={value}
+              value={value.toString()}
               style={styles.textInput}
               keyboardType="numeric"
             />
@@ -115,7 +112,7 @@ export default function EditRecipeForm({ onClose, onSubmit, recipe }) {
                   <TextInput
                     onBlur={onBlur}
                     onChangeText={onChange}
-                    value={value}
+                    value={value.toString()}
                     style={styles.textInput}
                     placeholder="Amount"
                     keyboardType="numeric"

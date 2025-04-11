@@ -22,6 +22,10 @@ export default function PantryPage() {
   useFocusEffect(
     useCallback(() => {
       getIngredients();
+      return () => {
+        // or put onDelete here and update ingredients state
+        getIngredients();
+      };
     }, [])
   );
 
@@ -39,7 +43,7 @@ export default function PantryPage() {
       <Link
         href={{
           pathname: "pantry/ingredient/[id]",
-          params: { id: item.id },
+          params: { id: item.ingredient_id },
         }}>
         <IngredientListItem item={item} />
       </Link>
@@ -74,7 +78,7 @@ export default function PantryPage() {
         showsVerticalScrollIndicator={true}
         data={ingredients}
         contentContainerStyle={styles.listContainer}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.ingredient_id}
         renderItem={renderItem}
         onRefresh={onRefresh}
         refreshing={isFetching}

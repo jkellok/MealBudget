@@ -67,7 +67,7 @@ export default function AddRecipeForm({ onClose, onSubmit }) {
 
   const onHandleSubmit = (data) => {
     // if using value for instructions, desctructure into array
-    console.log(data);
+    console.log("Submitting:", data);
     onSubmit(data);
   };
 

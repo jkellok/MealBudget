@@ -13,8 +13,15 @@ const IngredientDetails = ({ ingredient }) => {
     <View style={styles.textContainer}>
       <Text style={styles.detailText}>Name: {ingredient.name}</Text>
       <Text style={styles.detailText}>Amount: {parseFloat(ingredient.amount)} {ingredient.unit}</Text>
-      <Text style={styles.detailText}>Price per kg: {ingredient.price_per_kg} €/kg</Text>
-      <Text>More details to come...</Text>
+      <Text style={styles.detailText}>Cost per kg: {ingredient.cost_per_kg} €/kg</Text>
+      {ingredient.cost_per_unit && <Text style={styles.detailText}>Cost per unit: {ingredient.cost_per_unit} €</Text>}
+      {ingredient.expiration_date && <Text style={styles.detailText}>Expiration date: {new Date(ingredient.expiration_date).toLocaleDateString()}</Text>}
+      {ingredient.buy_date && <Text style={styles.detailText}>Buy date: {new Date(ingredient.buy_date).toLocaleDateString()}</Text>}
+      {ingredient.aisle && <Text style={styles.detailText}>Aisle: {ingredient.aisle}</Text>}
+      {ingredient.brand && <Text style={styles.detailText}>Brand: {ingredient.brand}</Text>}
+      {ingredient.store && <Text style={styles.detailText}>Store: {ingredient.store}</Text>}
+      {ingredient.on_sale && <Text style={styles.detailText}>On sale: {ingredient.on_sale.toString()}</Text>}
+      {ingredient.in_pantry && <Text style={styles.detailText}>In pantry: {ingredient.in_pantry.toString()}</Text>}
     </View>
   );
 };

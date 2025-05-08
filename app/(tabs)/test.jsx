@@ -7,6 +7,8 @@ import ImageViewer from "../../components/ImageViewer";
 import IconButton from "../../components/IconButton";
 import CircleButton from "../../components/CircleButton";
 
+import ImagePickerComponent from "../../components/ImagePickerComponent";
+
 const PlaceholderImage = require("@/assets/images/react-logo.png");
 
 const IngredientTest = () => {
@@ -48,7 +50,7 @@ const IngredientTest = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.imageContainer}>
+{/*       <View style={styles.imageContainer}>
         <ImageViewer imgSource={PlaceholderImage} selectedImage={selectedImage} />
       </View>
       {showAppOptions ? (
@@ -64,7 +66,8 @@ const IngredientTest = () => {
           <Button theme="primary" label="Choose a photo" onPress={pickImageAsync} />
           <Button label="Use this photo" onPress={() => setShowAppOptions(true)} />
         </View>
-      )}
+      )} */}
+      <ImagePickerComponent />
     </View>
   );
 };

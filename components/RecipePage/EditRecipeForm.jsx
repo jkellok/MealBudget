@@ -1,17 +1,20 @@
 import { StyleSheet, TextInput, View, Text } from "react-native";
+import { useState } from "react";
 import { useForm, Controller, useFieldArray } from "react-hook-form";
+import Checkbox from "expo-checkbox";
 import { Picker } from "@react-native-picker/picker";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import Button from "../Button";
 import IconButton from "../IconButton";
+import ImagePickerComponent from "../ImagePickerComponent";
 
 const schema = yup
   .object({
     title: yup
-      .string().required()
-      .min(3)
-      .max(199),
+      .string().required().min(3).max(199),
+    description: yup
+      .string().min(3),
     servings: yup
       .number().positive().required(),
     ingredients: yup
@@ -25,19 +28,49 @@ const schema = yup
     instructions: yup
       .array().of(
         yup.string().required()
-      ).min(1)
+      ).min(1),
+    category: yup
+      .string().min(3),
+    tags: yup
+      .array().of(
+        yup.string()
+      ),
+    difficulty: yup
+      .string().min(3),
+    rating: yup
+      .number().min(0).max(5),
+    minutes_to_make: yup
+      .number().positive(),
+    notes: yup
+      .string().min(3),
+    image: yup
+      .string(),
+    is_favorite: yup
+      .boolean()
   })
   .required();
 
 export default function EditRecipeForm({ onClose, onSubmit, recipe }) {
   const defaultValues = {
     title: recipe.title,
-    servings: recipe.servings,
+    description: recipe.description ? recipe.description : undefined,
+    servings: recipe.servings.toString(),
     ingredients: recipe.ingredients,
-    instructions: recipe.instructions
+    instructions: recipe.instructions,
+    category: recipe.category ? recipe.category : undefined,
+    tags: recipe.tags ? recipe.tags : undefined,
+    difficulty: recipe.difficulty ? recipe.difficulty : undefined,
+    rating: recipe.rating ? recipe.rating.toString() : undefined,
+    minutes_to_make: recipe.minutes_to_make ? recipe.minutes_to_make.toString() : undefined,
+    notes: recipe.notes ? recipe.notes : undefined,
+    image: recipe.image ? recipe.image : undefined,
+    is_favorite: recipe.is_favorite
   };
 
-  const { control, handleSubmit, formState: { errors } } = useForm({
+  const [isFavorite, setIsFavorite] = useState(defaultValues.is_favorite);
+  const [showImageField, setShowImageField] = useState(false); // defaultValues.image ? true : false
+
+  const { control, handleSubmit, formState: { errors, isDirty }, setValue } = useForm({
     // form validation debug
     resolver: async (data, context, options) => {
       console.log("formdata", data);
@@ -61,14 +94,35 @@ export default function EditRecipeForm({ onClose, onSubmit, recipe }) {
     control
   });
 
+  const { fields: fieldsTags, append: appendTags, remove: removeTags } = useFieldArray({
+    name: "tags",
+    control
+  });
+
   const onHandleSubmit = (data) => {
     console.log("Submitting:", data);
     onSubmit(data);
   };
 
+  const onChangeCheckbox = (field, value) => {
+    if (field === "is_favorite") setIsFavorite(value);
+    setValue(field, value, {
+      shouldDirty: true
+    });
+  };
+
+  const handleSelectedImage = (imageUri) => {
+    setValue("image", imageUri);
+  };
+
+  const handleShowField = (boolean) => {
+    setShowImageField(boolean);
+  };
+
   return (
     <View>
       <View style={styles.formContainer}>
+        {isDirty && <Text style={styles.errorText}>Unsaved changes!</Text>}
         <Text>Title</Text>
         <Controller
           control={control}
@@ -86,6 +140,22 @@ export default function EditRecipeForm({ onClose, onSubmit, recipe }) {
         />
         {errors.title && <Text style={styles.errorText}>{errors.title.message}</Text>}
 
+        <Text>Description</Text>
+        <Controller
+          control={control}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              placeholder="Description"
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+              style={styles.textInput}
+            />
+          )}
+          name="description"
+        />
+        {errors.description && <Text style={styles.errorText}>{errors.description.message}</Text>}
+
         <Text>Servings</Text>
         <Controller
           control={control}
@@ -94,7 +164,7 @@ export default function EditRecipeForm({ onClose, onSubmit, recipe }) {
               placeholder="Servings*"
               onBlur={onBlur}
               onChangeText={onChange}
-              value={value.toString()}
+              value={value}
               style={styles.textInput}
               keyboardType="numeric"
             />
@@ -133,6 +203,14 @@ export default function EditRecipeForm({ onClose, onSubmit, recipe }) {
                       <Picker.Item label="g" value="g" />
                       <Picker.Item label="l" value="l" />
                       <Picker.Item label="ml" value="ml" />
+                      <Picker.Item label="tbsp" value="tbsp" />
+                      <Picker.Item label="tsp" value="tsp" />
+                      <Picker.Item label="dl" value="dl" />
+                      <Picker.Item label="cup" value="cup" />
+                      <Picker.Item label="cl" value="cl" />
+                      <Picker.Item label="lbs" value="lbs" />
+                      <Picker.Item label="oz" value="oz" />
+                      <Picker.Item label="fl oz" value="fl oz" />
                       <Picker.Item label="pcs" value="pcs" />
                     </Picker>
                   </View>
@@ -194,6 +272,159 @@ export default function EditRecipeForm({ onClose, onSubmit, recipe }) {
         {errors.instructions && <Text style={styles.errorText}>{errors.instructions.message}</Text>}
         <IconButton icon="add" onPress={() => appendInst("")} />
 
+        <Text>Category</Text>
+        <Controller
+          control={control}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              placeholder="Category"
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+              style={styles.textInput}
+            />
+          )}
+          name="category"
+        />
+        {errors.category && <Text style={styles.errorText}>{errors.category.message}</Text>}
+
+        <Text>Tags</Text>
+        {fieldsTags.map((field, index) => {
+          return (
+            <View key={field.id}>
+              <View style={styles.fieldArrayContainer}>
+                <Controller
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <TextInput
+                      onBlur={onBlur}
+                      onChangeText={onChange}
+                      value={value}
+                      style={styles.textInput}
+                      placeholder="Tags"
+                    />
+                  )}
+                  name={`tags.${index}`}
+                  control={control}
+                />
+                {index > 0 && (
+                  <IconButton icon="delete" onPress={() => removeTags(index)} />
+                )}
+              </View>
+              {errors.tags && <Text style={styles.errorText}>{errors.tags[index]?.message}</Text>}
+            </View>
+
+          );
+        })}
+        {errors.tags && <Text style={styles.errorText}>{errors.tags.message}</Text>}
+        <IconButton icon="add" onPress={() => appendTags("")} />
+
+        {/* Options easy, intermediate, hard? */}
+        <Text>Difficulty</Text>
+        <Controller
+          control={control}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              placeholder="Difficulty"
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+              style={styles.textInput}
+            />
+          )}
+          name="difficulty"
+        />
+        {errors.difficulty && <Text style={styles.errorText}>{errors.difficulty.message}</Text>}
+
+        {/* Options 0-5 or 1-5 */}
+        <Text>Rating</Text>
+        <Controller
+          control={control}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              placeholder="Rating"
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+              style={styles.textInput}
+              keyboardType="numeric"
+            />
+          )}
+          name="rating"
+        />
+        {errors.rating && <Text style={styles.errorText}>{errors.rating.message}</Text>}
+
+        {/* Could have options like under 15, 15-30, 30-45, 45-60, over 60, over 2h, multiple hours */}
+        <Text>Minutes to make</Text>
+        <Controller
+          control={control}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              placeholder="Minutes to make"
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+              style={styles.textInput}
+              keyboardType="numeric"
+            />
+          )}
+          name="minutes_to_make"
+        />
+        {errors.minutes_to_make && <Text style={styles.errorText}>{errors.minutes_to_make.message}</Text>}
+
+        <Text>Notes</Text>
+        <Controller
+          control={control}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              placeholder="Notes"
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+              style={styles.textInput}
+            />
+          )}
+          name="notes"
+        />
+        {errors.notes && <Text style={styles.errorText}>{errors.notes.message}</Text>}
+
+        {/* Upload image from phone (or possibly from internet) */}
+        <Text>Image</Text>
+        <Controller
+          control={control}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <View style={styles.imageFieldContainer}>
+              <ImagePickerComponent handleSelectedImage={handleSelectedImage} showField={handleShowField} defaultImage={defaultValues.image} />
+              {showImageField && (
+                <TextInput
+                  placeholder="Paste image URI here"
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value}
+                  style={styles.textInput}
+                />
+              )}
+            </View>
+          )}
+          name="image"
+        />
+        {errors.image && <Text style={styles.errorText}>{errors.image.message}</Text>}
+
+        <Text>Is Favorite</Text>
+        <Controller
+          control={control}
+          render={({ field: { onBlur, name } }) => (
+            <Checkbox
+              style={styles.checkbox}
+              onValueChange={(value) => onChangeCheckbox(name, value)}
+              onBlur={onBlur}
+              value={isFavorite}
+            />
+          )}
+          name="is_favorite"
+          defaultValue={defaultValues.is_favorite}
+        />
+        {errors.is_favorite && <Text style={styles.errorText}>{errors.is_favorite.message}</Text>}
+
       </View>
       <View style={styles.buttonContainer}>
         <Button label="Cancel" onPress={onClose} />
@@ -243,5 +474,13 @@ const styles = StyleSheet.create({
   fieldArrayContainer: {
     alignItems: "center",
     flexDirection: "row",
+  },
+  imageFieldContainer: {
+    //flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    flexWrap: "wrap",
+    height: 40,
+    alignContent: "center",
   },
 });

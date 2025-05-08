@@ -11,6 +11,11 @@ const getLinkedIngredientsByRecipe = async (id) => {
   return data;
 };
 
+const getOneLinkedIngredientCostPerKg = async (recipeId, ingredientId) => {
+  const { data } = await axios.get(`${apiBaseUrl}/linked_ingredients/${recipeId}/ingredient/${ingredientId}`);
+  return data;
+};
+
 const getOneLinkedIngredientByRecipe = async (recipeId, ingredientId) => {
   const { data } = await axios.get(`${apiBaseUrl}/linked_ingredients/${recipeId}/ingredient/${ingredientId}`);
   return data;
@@ -26,9 +31,13 @@ const createNewLinkedIngredient = async (recipeId, object) => {
   return data;
 };
 
-// ADD LATER?
-const updateIngredient = async (object, id) => {
-  const { data } = await axios.put(`${apiBaseUrl}/linked_ingredients/${id}`, object);
+const updateLinkedIngredient = async (recipeId, object) => {
+  const { data } = await axios.put(`${apiBaseUrl}/linked_ingredients/${recipeId}`, object);
+  return data;
+};
+
+const updateIngredientCost = async (recipeId, ingredientId, object) => {
+  const { data } = await axios.put(`${apiBaseUrl}/linked_ingredients/${recipeId}/ingredient/${ingredientId}`, object);
 
   return data;
 };
@@ -41,9 +50,11 @@ const deleteLinkedIngredient = async (recipeId, ingredientId) => {
 export default {
   getAllLinkedIngredients,
   getLinkedIngredientsByRecipe,
+  getOneLinkedIngredientCostPerKg,
   getOneLinkedIngredientByRecipe,
   getLinkedRecipesByIngredient,
   createNewLinkedIngredient,
-  //updateIngredient,
+  updateLinkedIngredient,
+  updateIngredientCost,
   deleteLinkedIngredient
 };

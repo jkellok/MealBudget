@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, View } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
-export default function IconButton({ icon, onPress}) {
+export default function IconButton({ icon, onPress }) {
   return (
     <View style={styles.IconButtonContainer}>
       <Pressable style={styles.iconButton} onPress={onPress}>
@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
   IconButtonContainer: {
     width: 34,
     height: 34,
-    marginHorizontal: 6,
+    marginHorizontal: 5,
     borderWidth: 3,
     borderColor: "#000",
     borderRadius: 20,

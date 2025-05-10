@@ -226,6 +226,7 @@ export default function EditRecipeForm({ onClose, onSubmit, recipe }) {
                     value={value}
                     style={styles.textInput}
                     placeholder="Name"
+                    autoCapitalize="none"
                   />
                 )}
                 name={`ingredients.${index}.name`}
@@ -282,6 +283,7 @@ export default function EditRecipeForm({ onClose, onSubmit, recipe }) {
               onChangeText={onChange}
               value={value}
               style={styles.textInput}
+              autoCapitalize="none"
             />
           )}
           name="category"
@@ -301,6 +303,7 @@ export default function EditRecipeForm({ onClose, onSubmit, recipe }) {
                       value={value}
                       style={styles.textInput}
                       placeholder="Tags"
+                      autoCapitalize="none"
                     />
                   )}
                   name={`tags.${index}`}
@@ -329,6 +332,7 @@ export default function EditRecipeForm({ onClose, onSubmit, recipe }) {
               onChangeText={onChange}
               value={value}
               style={styles.textInput}
+              autoCapitalize="none"
             />
           )}
           name="difficulty"
@@ -401,6 +405,7 @@ export default function EditRecipeForm({ onClose, onSubmit, recipe }) {
                   onChangeText={onChange}
                   value={value}
                   style={styles.textInput}
+                  autoCapitalize="none"
                 />
               )}
             </View>

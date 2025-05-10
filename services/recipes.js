@@ -8,33 +8,34 @@ const getAllRecipes = async () => {
   return data;
 };
 
-const getRecipe = async (id) => {
-  const { data } = await axios.get(`${apiBaseUrl}/recipes/${id}`);
+const getRecipesByUser = async (userId) => {
+  const { data } = await axios.get(`${apiBaseUrl}/recipes/users/${userId}`);
   return data;
 };
 
-const createNewRecipe = async (object) => {
-  //try {
-    const { data } = await axios.post(`${apiBaseUrl}/recipes`, object);
-    return data;
-  //} catch (err) {
-  //  console.error(err);
-  //  throw err;
-  //}
-};
-
-const updateRecipe = async (object, id) => {
-  const { data } = await axios.put(`${apiBaseUrl}/recipes/${id}`, object);
+const getRecipe = async (id, userId) => {
+  const { data } = await axios.get(`${apiBaseUrl}/recipes/users/${userId}/entry/${id}`);
   return data;
 };
 
-const deleteRecipe = async (id) => {
-  const { data } = await axios.delete(`${apiBaseUrl}/recipes/${id}`);
+const createNewRecipe = async (object, userId) => {
+  const { data } = await axios.post(`${apiBaseUrl}/recipes/users/${userId}`, object);
+  return data;
+};
+
+const updateRecipe = async (object, id, userId) => {
+  const { data } = await axios.put(`${apiBaseUrl}/recipes/users/${userId}/entry/${id}`, object);
+  return data;
+};
+
+const deleteRecipe = async (id, userId) => {
+  const { data } = await axios.delete(`${apiBaseUrl}/recipes/users/${userId}/entry/${id}`);
   return data;
 };
 
 export default {
   getAllRecipes,
+  getRecipesByUser,
   getRecipe,
   createNewRecipe,
   updateRecipe,

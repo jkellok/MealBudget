@@ -1,16 +1,11 @@
 import { Text, View, StyleSheet } from "react-native";
-import { Link } from "expo-router";
+import HomePage from "../../../components/HomePage";
 
 export default function HomeScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Home screen</Text>
-      <Link href="/pantry" style={styles.button}>
-        Go to Pantry Screen
-      </Link>
-      <Link href="/recipes" style={styles.button}>
-        Go to Recipes Screen
-      </Link>
+      <HomePage />
     </View>
   );
 }
@@ -23,11 +18,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   text: {
-    color: "#fff",
-  },
-  button: {
-    fontSize: 20,
-    textDecorationLine: "underline",
     color: "#fff",
   },
 });

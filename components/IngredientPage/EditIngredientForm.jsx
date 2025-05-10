@@ -130,6 +130,7 @@ export default function EditIngredientForm({ onClose, onSubmit, ingredient }) {
               onChangeText={onChange}
               value={value}
               style={styles.textInput}
+              autoCapitalize="none"
             />
           )}
           name="name"
@@ -294,6 +295,7 @@ export default function EditIngredientForm({ onClose, onSubmit, ingredient }) {
               onChangeText={onChange}
               value={value}
               style={styles.textInput}
+              autoCapitalize="none"
             />
           )}
           name="aisle"
@@ -311,6 +313,7 @@ export default function EditIngredientForm({ onClose, onSubmit, ingredient }) {
               onChangeText={onChange}
               value={value}
               style={styles.textInput}
+              autoCapitalize="none"
             />
           )}
           name="brand"

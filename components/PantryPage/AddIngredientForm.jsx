@@ -118,6 +118,7 @@ export default function AddIngredientForm({ onClose, onSubmit }) {
               onChangeText={onChange}
               value={value}
               style={styles.textInput}
+              autoCapitalize="none"
             />
           )}
           name="name"
@@ -276,6 +277,7 @@ export default function AddIngredientForm({ onClose, onSubmit }) {
               onChangeText={onChange}
               value={value}
               style={styles.textInput}
+              autoCapitalize="none"
             />
           )}
           name="aisle"
@@ -292,6 +294,7 @@ export default function AddIngredientForm({ onClose, onSubmit }) {
               onChangeText={onChange}
               value={value}
               style={styles.textInput}
+              autoCapitalize="none"
             />
           )}
           name="brand"

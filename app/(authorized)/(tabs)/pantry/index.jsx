@@ -1,5 +1,5 @@
 import { View, StyleSheet } from "react-native";
-import PantryPage from "../../../components/PantryPage";
+import PantryPage from "../../../../components/PantryPage";
 
 export default function PantryScreen() {
   return (

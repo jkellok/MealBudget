@@ -80,11 +80,11 @@ const RecipeDetails = ({ recipe, combinedIngredientArray, onLinkIngredient, onUn
       </View>
 
       <View style={styles.detailsContainer}>
-        {/* {recipe.image && (
+        {recipe.image && (
           <View style={styles.imageContainer}>
             <Image source={recipe.image} style={styles.image} />
           </View>
-        )} */}
+        )}
         <View>
           <Text style={styles.detailText}>Servings: {recipe.servings}</Text>
           {recipe.cost_per_serving && (<Text style={styles.detailText}>Cost per serving: {recipe.cost_per_serving}</Text>)}

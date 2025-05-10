@@ -11,14 +11,14 @@ export default function RecipeListItem({ item }) {
   return (
     <View style={styles.itemContainer}>
       <View style={styles.rowContainer}>
-        {/* <Image
+        <Image
           style={styles.image}
           placeholder={placeholderImage}
           placeholderContentFit="cover"
           source={image}
           contentFit="cover"
           transition={1000}
-        /> */}
+        />
         <View>
           <Text style={styles.title}>
             {title}

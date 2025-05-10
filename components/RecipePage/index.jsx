@@ -9,6 +9,7 @@ import Button from "../Button";
 import EditRecipeForm from "./EditRecipeForm";
 import IconButton from "../IconButton";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { useAuthSession } from "../../hooks/AuthProvider";
 
 const IngredientsList = ({ combinedIngredientArray, onLinkIngredient, onUnlinkIngredient }) => {
   const renderIngredient = ({ item }) => (
@@ -79,11 +80,11 @@ const RecipeDetails = ({ recipe, combinedIngredientArray, onLinkIngredient, onUn
       </View>
 
       <View style={styles.detailsContainer}>
-        {recipe.image && (
+        {/* {recipe.image && (
           <View style={styles.imageContainer}>
             <Image source={recipe.image} style={styles.image} />
           </View>
-        )}
+        )} */}
         <View>
           <Text style={styles.detailText}>Servings: {recipe.servings}</Text>
           {recipe.cost_per_serving && (<Text style={styles.detailText}>Cost per serving: {recipe.cost_per_serving}</Text>)}
@@ -117,9 +118,10 @@ export default function RecipePage() {
   const [linkedIngredients, setLinkedIngredients] = useState([]);
   const [recipeCost, setRecipeCost] = useState(null);
   const [combinedIngredientArray, setCombinedIngredientArray] = useState([]);
+  const { userId } = useAuthSession();
 
   const getRecipe = async (id) => {
-    const recipe = await recipeService.getRecipe(id);
+    const recipe = await recipeService.getRecipe(id, userId.current);
     setRecipe(recipe);
   };
 
@@ -144,7 +146,7 @@ export default function RecipePage() {
       setRecipeCost(totalIngredientCost);
       try {
         const values = { ...recipe, total_cost: totalIngredientCost };
-        const updatedRecipe = await recipeService.updateRecipe(values, recipe.recipe_id);
+        const updatedRecipe = await recipeService.updateRecipe(values, recipe.recipe_id, userId.current);
         setRecipe(updatedRecipe);
       } catch (err) {
         console.error(err);
@@ -195,7 +197,7 @@ export default function RecipePage() {
 
   const handleDeletion = async () => {
     try {
-      await recipeService.deleteRecipe(id);
+      await recipeService.deleteRecipe(id, userId.current);
       router.back();
     } catch (err) {
       console.error(err);
@@ -213,7 +215,7 @@ export default function RecipePage() {
 
   const submitUpdatedRecipe = async (values) => {
     try {
-      const updatedRecipe = await recipeService.updateRecipe(values, recipe.recipe_id);
+      const updatedRecipe = await recipeService.updateRecipe(values, recipe.recipe_id, userId.current);
       // update linked ingredients
       // maybe fetch and get the recipe from db?
       updateLinkedIngredients(values.ingredients);

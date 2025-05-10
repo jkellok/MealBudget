@@ -6,15 +6,19 @@ import ingredientService from "../../services/ingredients";
 import AddButton from "../AddButton";
 import AddIngredientForm from "./AddIngredientForm";
 import ModalComponent from "../ModalComponent";
+import { useAuthSession } from "../../hooks/AuthProvider";
 
 export default function PantryPage() {
   const [ingredients, setIngredients] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [error, setError] = useState(null);
   const [isFetching, setIsFetching] = useState(false);
+  const { userId } = useAuthSession();
 
   const getIngredients = async () => {
-    const ingredients = await ingredientService.getAllIngredients();
+    //const ingredients = await ingredientService.getAllIngredients();
+    console.log("getting ingredients for usreid", userId.current);
+    const ingredients = await ingredientService.getIngredientsByUser(userId.current);
     setIngredients(ingredients);
     setIsFetching(false);
   };
@@ -60,7 +64,7 @@ export default function PantryPage() {
 
   const submitNewIngredient = async (values) => {
     try {
-      const ingredient = await ingredientService.createNewIngredient(values);
+      const ingredient = await ingredientService.createNewIngredient(values, userId.current);
       setIngredients(ingredients.concat(ingredient));
       onModalClose();
     } catch (err) {

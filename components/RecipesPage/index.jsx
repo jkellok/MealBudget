@@ -6,15 +6,17 @@ import recipeService from "../../services/recipes";
 import AddButton from "../AddButton";
 import AddRecipeForm from "./AddRecipeForm";
 import ModalComponent from "../ModalComponent";
+import { useAuthSession } from "../../hooks/AuthProvider";
 
 export default function RecipesPage() {
   const [recipes, setRecipes] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [error, setError] = useState(null);
   const [isFetching, setIsFetching] = useState(false);
+  const { userId } = useAuthSession();
 
   const getRecipes = async () => {
-    const recipes = await recipeService.getAllRecipes();
+    const recipes = await recipeService.getRecipesByUser(userId.current);
     setRecipes(recipes);
     setIsFetching(false);
   };
@@ -56,7 +58,7 @@ export default function RecipesPage() {
 
   const submitNewRecipe = async (values) => {
     try {
-      const recipe = await recipeService.createNewRecipe(values);
+      const recipe = await recipeService.createNewRecipe(values, userId.current);
       setRecipes(recipes.concat(recipe));
       onModalClose();
     } catch (err) {

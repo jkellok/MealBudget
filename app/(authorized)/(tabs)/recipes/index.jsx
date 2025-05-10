@@ -1,10 +1,10 @@
 import { View, StyleSheet } from "react-native";
-import IngredientPage from "../../../../components/IngredientPage";
+import RecipesPage from "../../../../components/RecipesPage";
 
-export default function IngredientScreen() {
+export default function RecipesScreen() {
   return (
     <View style={styles.container}>
-      <IngredientPage />
+      <RecipesPage />
     </View>
   );
 }

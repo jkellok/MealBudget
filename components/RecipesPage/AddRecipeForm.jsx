@@ -219,6 +219,7 @@ export default function AddRecipeForm({ onClose, onSubmit }) {
                     value={value}
                     style={styles.textInput}
                     placeholder="Name"
+                    autoCapitalize="none"
                   />
                 )}
                 name={`ingredients.${index}.name`}
@@ -275,6 +276,7 @@ export default function AddRecipeForm({ onClose, onSubmit }) {
               onChangeText={onChange}
               value={value}
               style={styles.textInput}
+              autoCapitalize="none"
             />
           )}
           name="category"
@@ -294,6 +296,7 @@ export default function AddRecipeForm({ onClose, onSubmit }) {
                       value={value}
                       style={styles.textInput}
                       placeholder="Tags"
+                      autoCapitalize="none"
                     />
                   )}
                   name={`tags.${index}`}
@@ -322,6 +325,7 @@ export default function AddRecipeForm({ onClose, onSubmit }) {
               onChangeText={onChange}
               value={value}
               style={styles.textInput}
+              autoCapitalize="none"
             />
           )}
           name="difficulty"
@@ -380,7 +384,6 @@ export default function AddRecipeForm({ onClose, onSubmit }) {
         />
         {errors.notes && <Text style={styles.errorText}>{errors.notes.message}</Text>}
 
-        {/* Upload image from phone (or possibly from internet) */}
         <Text>Image</Text>
         <Controller
           control={control}
@@ -394,6 +397,7 @@ export default function AddRecipeForm({ onClose, onSubmit }) {
                   onChangeText={onChange}
                   value={value}
                   style={styles.textInput}
+                  autoCapitalize="none"
                 />
               )}
             </View>

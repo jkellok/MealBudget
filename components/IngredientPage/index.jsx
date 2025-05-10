@@ -7,6 +7,7 @@ import { router, Stack, useLocalSearchParams, Link } from "expo-router";
 import Button from "../Button";
 import EditIngredientForm from "./EditIngredientForm";
 import RecipeListItem from "../RecipesPage/RecipeListItem";
+import { useAuthSession } from "../../hooks/AuthProvider";
 
 const IngredientDetails = ({ ingredient }) => {
   return (
@@ -69,9 +70,10 @@ export default function IngredientPage() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [error, setError] = useState(null);
   const [linkedRecipes, setLinkedRecipes] = useState([]);
+  const { userId } = useAuthSession();
 
   const getIngredient = async (id) => {
-    const ingredient = await ingredientService.getIngredient(id);
+    const ingredient = await ingredientService.getIngredient(id, userId.current);
     setIngredient(ingredient);
   };
 
@@ -87,7 +89,7 @@ export default function IngredientPage() {
 
   const onDelete = async () => {
     try {
-      await ingredientService.deleteIngredient(id);
+      await ingredientService.deleteIngredient(id, userId.current);
       router.back();
     } catch (err) {
       console.error(err);
@@ -105,7 +107,7 @@ export default function IngredientPage() {
 
   const submitUpdatedIngredient = async (values) => {
     try {
-      const updatedIngredient = await ingredientService.updateIngredient(values, ingredient.ingredient_id);
+      const updatedIngredient = await ingredientService.updateIngredient(values, ingredient.ingredient_id, userId.current);
       setIngredient(updatedIngredient);
       onModalClose();
     } catch (err) {

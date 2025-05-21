@@ -23,9 +23,7 @@ export default function LoginForm() {
   const { signIn } = useAuthSession();
 
   const onHandleSubmit = (data) => {
-    console.log("Submitting:", data);
     const token = Crypto.randomUUID();
-    console.log("generated token", token);
     signIn(token, data);
   };
 

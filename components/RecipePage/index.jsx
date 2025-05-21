@@ -1,71 +1,42 @@
-import { useEffect, useState } from "react";
-import { StyleSheet, Text, View, FlatList, Alert } from "react-native";
+import { useEffect, useState, useCallback } from "react";
+import { StyleSheet, Text, View, Alert, ScrollView } from "react-native";
 import { Image } from "expo-image";
 import recipeService from "../../services/recipes";
 import linkedIngredientService from "../../services/linked_ingredients";
-import ModalComponent from "../ModalComponent";
-import { router, Stack, useLocalSearchParams } from "expo-router";
+import { router, Stack, useLocalSearchParams, Link, useFocusEffect } from "expo-router";
 import Button from "../Button";
-import EditRecipeForm from "./EditRecipeForm";
 import IconButton from "../IconButton";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { useAuthSession } from "../../hooks/AuthProvider";
+import RatingBar from "../RatingBar";
 
 const IngredientsList = ({ combinedIngredientArray, onLinkIngredient, onUnlinkIngredient }) => {
-  const renderIngredient = ({ item }) => (
-    <View style={{ flexDirection: "row" }}>
-      <Text><Text style={{fontWeight: "bold"}}>{`\u2022 ${item.amount} ${item.unit} `}</Text>{item.name}</Text>
-      {item.cost && <Text style={styles.costText}> ({item.cost} €)</Text>}
-      {item.ingredient_id && <IconButton icon="link-off" onPress={() => onUnlinkIngredient(item.ingredient_id)} />}
-      {!item.ingredient_id && <IconButton icon="link" onPress={() => onLinkIngredient(item)} />}
-    </View>
-  );
-
+  if (!combinedIngredientArray) return null;
   return (
-    <View>
-      <Text style={styles.detailText}>Ingredients:</Text>
-      <FlatList
-        data={combinedIngredientArray}
-        keyExtractor={(item) => item.name}
-        renderItem={renderIngredient}
-      />
+    <View style={styles.subtitleAndTextContainer}>
+      <Text style={styles.subtitle}>Ingredients:</Text>
+      {combinedIngredientArray.map((item, index) => (
+        <View style={styles.rowContainer} key={index}>
+          <Text><Text style={{fontWeight: "bold"}}>{`\u2022 ${item.amount} ${item.unit} `}</Text>{item.name}</Text>
+          {item.cost && <Text style={styles.costText}> ({item.cost} €)</Text>}
+          {item.ingredient_id && <IconButton icon="link-off" onPress={() => onUnlinkIngredient(item.ingredient_id)} />}
+          {!item.ingredient_id && <IconButton icon="link" onPress={() => onLinkIngredient(item)} />}
+        </View>
+      ))}
     </View>
   );
 };
 
 const InstructionsList = ({ instructions }) => {
-  const renderInstruction = ({ item, index }) => (
-    <View>
-      <Text>{index + 1}. {item}</Text>
-    </View>
-  );
-
   return (
-    <View>
-      <Text style={styles.detailText}>Instructions:</Text>
-      <FlatList
-        data={instructions}
-        renderItem={renderInstruction}
-      />
-    </View>
-  );
-};
-
-const TagsList = ({ tags }) => {
-  const renderTags = ({ item, index }) => (
-    <View>
-      <Text>#{item} </Text>
-    </View>
-  );
-
-  return (
-    <View>
-      <Text style={styles.detailText}>Tags:</Text>
-      <FlatList
-        data={tags}
-        renderItem={renderTags}
-        horizontal
-      />
+    <View style={styles.subtitleAndTextContainer}>
+      <Text style={styles.subtitle}>Instructions:</Text>
+      {instructions.map((item, index) => (
+        <View key={index}>
+          <Text>{index + 1}. {item}</Text>
+        </View>
+      ))}
     </View>
   );
 };
@@ -73,9 +44,10 @@ const TagsList = ({ tags }) => {
 const RecipeDetails = ({ recipe, combinedIngredientArray, onLinkIngredient, onUnlinkIngredient }) => {
   return (
     <View style={styles.recipeContainer}>
-      <View style={styles.detailsContainer}>
-        <Text style={styles.detailText}>{recipe.title}</Text>
+      <View style={styles.titleContainer}>
+        <Text style={styles.title}>{recipe.title}</Text>
         {/* Could use iconButton to press to toggle isFavorite */}
+        {!recipe.is_favorite && <MaterialIcons name="favorite-outline" size={20} color="black" style={{ paddingLeft: 10 }} />}
         {recipe.is_favorite && <MaterialIcons name="favorite" size={20} color="red" style={{ paddingLeft: 10 }} />}
       </View>
 
@@ -85,27 +57,66 @@ const RecipeDetails = ({ recipe, combinedIngredientArray, onLinkIngredient, onUn
             <Image source={recipe.image} style={styles.image} />
           </View>
         )}
-        <View>
-          <Text style={styles.detailText}>Servings: {recipe.servings}</Text>
-          {recipe.cost_per_serving && (<Text style={styles.detailText}>Cost per serving: {recipe.cost_per_serving}</Text>)}
-          {recipe.total_cost && (<Text style={styles.detailText}>Total cost: {recipe.total_cost}</Text>)}
-          {recipe.category && (<Text style={styles.detailText}>Category: {recipe.category}</Text>)}
-          {recipe.tags?.length > 0 && <TagsList tags={recipe.tags} />}
-          {recipe.difficulty && (<Text style={styles.detailText}>Difficulty: {recipe.difficulty}</Text>)}
-          {recipe.rating && (<Text style={styles.detailText}>Rating: {recipe.rating}</Text>)}
+        <View style={styles.detailsTextContainer}>
+          {recipe.rating && (
+            <View style={styles.rowContainer}>
+              <Text style={styles.detailText}>Rating: </Text>
+              <RatingBar rating={recipe.rating} size={20} />
+            </View>
+          )}
+          <View style={styles.rowContainer}>
+            <MaterialIcons name="person" size={16} color="black" />
+            <Text> {recipe.servings}</Text>
+          </View>
           {recipe.minutes_to_make && (
-            <View style={styles.detailsContainer}>
-              <MaterialIcons name="timelapse" size={20} style={{ paddingRight: 10 }} />
-              <Text style={styles.detailText}>{recipe.minutes_to_make} min</Text>
+            <View style={styles.rowContainer}>
+              <MaterialIcons name="timelapse" size={16} />
+              <Text style={styles.detailText}> {recipe.minutes_to_make} min</Text>
+            </View>
+          )}
+          {recipe.cost_per_serving && (
+            <View style={styles.rowContainer}>
+              <FontAwesome5 name="coins" size={16} color="black" />
+              <Text> {recipe.total_cost} € ({recipe.cost_per_serving} €/portion)</Text>
+            </View>
+          )}
+          {recipe.difficulty && (
+            <View style={styles.rowContainer}>
+              <Text style={styles.detailText}>Difficulty: {recipe.difficulty}</Text>
             </View>
           )}
         </View>
       </View>
+      <View>
+        {recipe.category && (
+          <View style={styles.rowContainer}>
+            <Text style={styles.detailText}>Category: {recipe.category}</Text>
+          </View>
+        )}
+        {recipe.tags?.length > 0 && (
+          <View style={styles.rowContainer}>
+            <Text style={styles.detailText}>Tags: </Text>
+            {recipe.tags.map((t, index) => <Text key={index} style={{ flexWrap: "nowrap", flexDirection: "column" }}>#{t} </Text>)}
+          </View>
+        )}
+      </View>
 
-      {recipe.description && (<Text style={styles.detailText}>Description: {recipe.description}</Text>)}
+      {recipe.description && (
+        <View style={styles.subtitleAndTextContainer}>
+          <Text style={styles.subtitle}>Description:</Text>
+          <Text>{recipe.description}</Text>
+        </View>
+      )}
+
       <IngredientsList combinedIngredientArray={combinedIngredientArray} onLinkIngredient={onLinkIngredient} onUnlinkIngredient={onUnlinkIngredient} />
       <InstructionsList instructions={recipe.instructions} />
-      {recipe.notes && (<Text style={styles.detailText}>Notes: {recipe.notes}</Text>)}
+
+      {recipe.notes && (
+        <View style={styles.subtitleAndTextContainer}>
+          <Text style={styles.subtitle}>Notes:</Text>
+          <Text>{recipe.notes}</Text>
+        </View>
+        )}
     </View>
   );
 };
@@ -113,29 +124,33 @@ const RecipeDetails = ({ recipe, combinedIngredientArray, onLinkIngredient, onUn
 export default function RecipePage() {
   const { id } = useLocalSearchParams();
   const [recipe, setRecipe] = useState(null);
-  const [isModalVisible, setIsModalVisible] = useState(false);
   const [error, setError] = useState(null);
   const [linkedIngredients, setLinkedIngredients] = useState([]);
-  const [recipeCost, setRecipeCost] = useState(null);
   const [combinedIngredientArray, setCombinedIngredientArray] = useState([]);
   const { userId } = useAuthSession();
 
-  const getRecipe = async (id) => {
+  const getRecipe = useCallback(async (id) => {
     const recipe = await recipeService.getRecipe(id, userId.current);
     setRecipe(recipe);
-  };
+  }, [userId]);
 
   const getLinkedIngredients = async (id) => {
     const linkedIngredients = await linkedIngredientService.getLinkedIngredientsByRecipe(id);
     setLinkedIngredients(linkedIngredients);
   };
 
-  useEffect(() => {
-    getRecipe(id);
-    getLinkedIngredients(id);
-  }, [id]);
+  useFocusEffect(
+    useCallback(() => {
+      getRecipe(id);
+      getLinkedIngredients(id);
+      return () => {
+        getRecipe(id);
+        getLinkedIngredients(id);
+      };
+    }, [getRecipe, id])
+  );
 
-  // CHANGE THIS
+  // could change this, maybe doesn't need to be an useeffect
   useEffect(() => {
     const getRecipeCost = async () => {
       let totalIngredientCost = 0;
@@ -143,7 +158,6 @@ export default function RecipePage() {
         totalIngredientCost += +linkedIngredients[i].ingredient_cost;
       }
       totalIngredientCost = totalIngredientCost.toFixed(2);
-      setRecipeCost(totalIngredientCost);
       try {
         const values = { ...recipe, total_cost: totalIngredientCost };
         const updatedRecipe = await recipeService.updateRecipe(values, recipe.recipe_id, userId.current);
@@ -154,11 +168,10 @@ export default function RecipePage() {
     };
 
     if (linkedIngredients.length === recipe?.ingredients.length) {
+      // calculate recipe cost if all ingredients are linked
       getRecipeCost();
-    } else {
-      setRecipeCost(null);
     }
-  }, [linkedIngredients, recipe?.ingredients.length]);
+  }, [linkedIngredients, recipe?.ingredients.length, userId]);
 
   useEffect(() => {
     // combine ingredients and linkedIngredients array
@@ -174,8 +187,6 @@ export default function RecipePage() {
           cost_kg: found.cost_per_kg // possibly not needed
         }) : i);
     });
-
-    console.log("ing array", ingredientArray);
     setCombinedIngredientArray(ingredientArray);
   }, [linkedIngredients, recipe?.ingredients]);
 
@@ -198,77 +209,16 @@ export default function RecipePage() {
   const handleDeletion = async () => {
     try {
       await recipeService.deleteRecipe(id, userId.current);
-      router.back();
+      router.dismiss();
     } catch (err) {
       console.error(err);
       setError("Error while deleting the recipe.");
     }
   };
 
-  const onUpdateRecipe = () => {
-    setIsModalVisible(true);
-  };
-
-  const onModalClose = () => {
-    setIsModalVisible(false);
-  };
-
-  const submitUpdatedRecipe = async (values) => {
-    try {
-      const updatedRecipe = await recipeService.updateRecipe(values, recipe.recipe_id, userId.current);
-      // update linked ingredients
-      // maybe fetch and get the recipe from db?
-      updateLinkedIngredients(values.ingredients);
-      setRecipe(updatedRecipe);
-      onModalClose();
-    } catch (err) {
-      console.error(err);
-      setError("Error editing the recipe");
-    }
-  };
-
-  const updateLinkedIngredients = async (editedIngredients) => {
-    const currIngredients = recipe.ingredients;
-    // compare new ingredient values with existing ingredients in the recipe
-    // if they are different, something has changed
-    // if the ingredient is linked, it needs to be updated
-
-    // move to helper function file?
-    const isSame = (a, b) => a.amount === b.amount && a.unit === b.unit && a.name === b.name;
-    const onlyInLeft = (left, right, compareFunction) =>
-      left.filter(leftValue =>
-        !right.some(rightValue =>
-          compareFunction(leftValue, rightValue)
-        )
-      );
-    // contains new edited ingredients, will not contain removed ingredients
-    const onlyInEdited = onlyInLeft(editedIngredients, currIngredients, isSame);
-    // contains old ingredients before submission, can contain ingredients that are to be removed
-    const onlyInCurr = onlyInLeft(currIngredients, editedIngredients, isSame);
-
-    // update each edited linked ingredient that are in onlyInEdited
-    for (let i = 0; i < onlyInEdited.length; i++) {
-      await linkedIngredientService.updateLinkedIngredient(recipe.recipe_id, onlyInEdited[i]);
-    }
-
-    // if a linked ingredient is deleted, onlyInEdited does not have the object while the object is in onlyInCurr
-    // if a linked ingredient is edited, it is in both arrays
-    // create a new array that contains the objects to be deleted
-    const linkedIngredientsToDelete = onlyInCurr.filter(({ name }) => !onlyInEdited.some((e) => e.name === name));
-
-    // get ingredient_id from linkedIngredients and unlink it
-    for (let i = 0; i < linkedIngredientsToDelete.length; i++) {
-      const linkedIngredientToDelete = linkedIngredients.find(l => l.name === linkedIngredientsToDelete[i].name);
-      onUnlinkIngredient(linkedIngredientToDelete.ingredient_id);
-    }
-
-    // update the view
-    getLinkedIngredients(id);
-  };
-
   const onLinkIngredient = async (ingredient) => {
     try {
-      const linkedIngredient = await linkedIngredientService.createNewLinkedIngredient(recipe.recipe_id, ingredient);
+      await linkedIngredientService.createNewLinkedIngredient(recipe.recipe_id, ingredient);
       getLinkedIngredients(recipe.recipe_id);
     } catch (err) {
       console.error(err);
@@ -281,29 +231,38 @@ export default function RecipePage() {
       await linkedIngredientService.deleteLinkedIngredient(recipe.recipe_id, ingredientId);
       const filteredLinkedIngredients = linkedIngredients.filter(l => l.ingredient_id !== ingredientId);
       setLinkedIngredients(filteredLinkedIngredients);
+      removeRecipeCost();
     } catch (err) {
       console.error(err);
       setError("Error unlinking the ingredient");
     }
   };
 
+  const removeRecipeCost = async () => {
+    try {
+      const values = { ...recipe, total_cost: null, cost_per_serving: null};
+      const updatedRecipe = await recipeService.updateRecipe(values, recipe.recipe_id, userId.current);
+      setRecipe(updatedRecipe);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   if (!recipe) return <Text>Loading recipe...</Text>;
 
   // onPress doesn't fire properly so probably can't have buttons in the header
-  const RecipeHeader = () => (
+  /* const RecipeHeader = () => (
     <View style={{ flexDirection: "row", width: 300, height: 40, justifyContent: "space-evenly", backgroundColor: "yellow" }}>
       <View style={{ backgroundColor: "blue", width: 150 }}>
         <Text>{recipe.title}</Text>
       </View>
       <View style={{ flexDirection: "row", justifyContent: "space-between", width: 100, backgroundColor: "red" }}>
-        <IconButton onPress={onUpdateRecipe} icon="edit" />
+        <IconButton onPress={onUpdateRecipe} icon="edit" size={24} />
         <IconButton onPress={onDelete} icon="delete" />
       </View>
     </View>
-  );
+  ); */
 
-  // only use flatlist here that consists of header and footer etc.?
-  // or just use map on the lists? and then scrollview
   return (
     <View style={styles.container}>
       <Stack.Screen
@@ -314,15 +273,22 @@ export default function RecipePage() {
         }}
       />
       {error && <Text style={styles.errorText}>{error}</Text>}
-      {recipeCost && <Text>Total cost / per serving: {recipeCost} € / {recipe.cost_per_serving} €</Text>}
-      <RecipeDetails recipe={recipe} combinedIngredientArray={combinedIngredientArray} onLinkIngredient={onLinkIngredient} onUnlinkIngredient={onUnlinkIngredient} />
+      <ScrollView>
+        <RecipeDetails recipe={recipe} combinedIngredientArray={combinedIngredientArray} onLinkIngredient={onLinkIngredient} onUnlinkIngredient={onUnlinkIngredient} />
+      </ScrollView>
+
       <View style={styles.buttonContainer}>
-        <Button label="Edit" onPress={onUpdateRecipe} theme="primary-icon" icon="edit" />
+        <Link
+          href={{
+            pathname: "recipes/recipe/[id]/edit",
+            params: { id: id }
+          }}
+          asChild
+        >
+          <Button label="Edit" theme="primary-icon" icon="edit" />
+        </Link>
         <Button label="Delete" onPress={onDelete} theme="secondary-icon" icon="delete" />
       </View>
-      <ModalComponent isVisible={isModalVisible} onClose={onModalClose} title="Edit recipe">
-        <EditRecipeForm onClose={onModalClose} onSubmit={submitUpdatedRecipe} recipe={recipe} />
-      </ModalComponent>
     </View>
   );
 }
@@ -332,7 +298,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     width: "100%",
     height: "100%",
-    padding: 10,
+    padding: 8,
   },
   errorText: {
     color: "red"
@@ -340,24 +306,20 @@ const styles = StyleSheet.create({
   buttonContainer: {
     marginTop: 10,
     flexDirection: "row",
-    position: "absolute",
-    bottom: 30,
     alignSelf: "center",
   },
   recipeContainer: {
     padding: 10,
   },
   detailText: {
-    fontSize: 20,
-    //textAlign: "center"
-    userSelect: "auto"
+    fontSize: 14,
+    userSelect: "auto",
   },
   costText: {
     fontSize: 12,
-    color: "#737373"
+    color: "#737373",
   },
   imageContainer: {
-    //flex: 1,
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
@@ -366,7 +328,6 @@ const styles = StyleSheet.create({
     margin: 10,
   },
   image: {
-    //flex: 1,
     width: "100%",
     height: "100%",
   },
@@ -375,4 +336,36 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 2,
   },
+  detailsTextContainer: {
+    width: "100%",
+    //height: "100%",
+  },
+  rowContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginRight: 6,
+    //flexWrap: "wrap",
+    //flex: 1,
+    maxWidth: "100%",
+  },
+  titleContainer: {
+    flexDirection: "row",
+    marginBottom: 2,
+    alignItems: "center",
+    flexWrap: "wrap"
+  },
+  title: {
+    fontSize: 20,
+  },
+  subtitle: {
+    fontsize: 16,
+    fontWeight: "bold",
+    fontVariant: "small-caps",
+  },
+  subtitleAndTextContainer: {
+    padding: 4,
+    marginVertical: 2,
+    borderColor: "black",
+    borderWidth: 1
+  }
 });

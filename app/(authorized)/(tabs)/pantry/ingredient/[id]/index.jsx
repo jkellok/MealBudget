@@ -1,10 +1,10 @@
 import { View, StyleSheet } from "react-native";
-import RecipePage from "../../../../../components/RecipePage";
+import IngredientPage from "../../../../../../components/IngredientPage";
 
-export default function RecipeScreen() {
+export default function IngredientScreen() {
   return (
     <View style={styles.container}>
-      <RecipePage />
+      <IngredientPage />
     </View>
   );
 }
@@ -15,8 +15,5 @@ const styles = StyleSheet.create({
     backgroundColor: "#25292e",
     justifyContent: "center",
     alignItems: "center",
-  },
-  text: {
-    color: "#fff",
   },
 });

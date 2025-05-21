@@ -1,14 +1,14 @@
 import { View, Text, StyleSheet } from "react-native";
 
 export default function IngredientListItem({ item }) {
-  const { name, amount, unit, cost_per_kg } = item;
+  const { name, amount, unit, cost_per_kg, expiration_date } = item;
   return (
     <View style={styles.itemContainer}>
       <Text style={styles.title}>
-        {name}
+        {name}, {parseFloat(amount)} {unit}
       </Text>
-      <Text style={styles.text}>{parseFloat(amount)} {unit}</Text>
       <Text style={styles.text}>{cost_per_kg} €/kg</Text>
+      {expiration_date && <Text style={styles.text}>Expiration date: {new Date(expiration_date).toLocaleDateString()}</Text>}
     </View>
   );
 }
@@ -20,10 +20,10 @@ const styles = StyleSheet.create({
   },
   text: {
     alignSelf: "center",
+    //fontSize: 14,
   },
   itemContainer: {
-    //width: "100%",
-    //flex: 0,
-    //backgroundColor: "red"
+    width: "100%",
+    height: "100%",
   },
 });

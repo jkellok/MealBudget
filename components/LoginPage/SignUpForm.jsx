@@ -4,7 +4,6 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import Button from "../Button";
 import { useAuthSession } from "../../hooks/AuthProvider";
-import usersService from "../../services/users";
 import * as Crypto from "expo-crypto";
 
 const schema = yup
@@ -23,28 +22,8 @@ export default function SignUpForm() {
 
   const { signUp } = useAuthSession();
 
-/*   const signUp = async (data) => {
-    try {
-      console.log("signing up with", data);
-      const token = Crypto.randomUUID();
-
-      console.log("generated token", token);
-      const newUser = await usersService.createNewUser(data);
-      console.log("new user is", newUser);
-      if (!newUser) alert("Failed creating new user");
-      alert("Registration successful! Use login form to log in");
-    } catch (err) {
-      console.error(err);
-      alert("Error registering new user", err.message);
-    }
-  }; */
-
   const onHandleSubmit = (data) => {
-    console.log("Submitting:", data);
-    console.log("registering");
-    console.log("signing up with", data);
     const token = Crypto.randomUUID();
-    console.log("generated token", token);
     signUp(token, data);
   };
 

@@ -2,7 +2,6 @@ import axios from "axios";
 const apiBaseUrl = process.env.EXPO_PUBLIC_API_BASE_URL;
 
 const createNewUser = async (object) => {
-  console.log("in create new user");
   const { data } = await axios.post(`${apiBaseUrl}/users`, object);
   return data;
 };

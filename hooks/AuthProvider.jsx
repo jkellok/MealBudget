@@ -26,13 +26,9 @@ export default function AuthProvider({ children }) {
   }, []);
 
   const signIn = useCallback(async (token, credentials) => {
-    console.log("token is", token);
-    console.log("credentials is", credentials);
     try {
       const user = await loginService.login(credentials);
-      console.log("user is", user);
       if (user) {
-        console.log("user id setting user", user.user_id);
         await AsyncStorage.setItem("token", token);
         tokenRef.current = token;
         await AsyncStorage.setItem("user-id", user.user_id.toString());
@@ -55,9 +51,7 @@ export default function AuthProvider({ children }) {
 
   const signUp = useCallback(async (token, credentials) => {
     try {
-      console.log("signing up in useAutg");
       const newUser = await usersService.createNewUser(credentials);
-      console.log("new user is", newUser);
       if (!newUser) alert("Failed creating new user");
       signIn(token, credentials);
     } catch (err) {

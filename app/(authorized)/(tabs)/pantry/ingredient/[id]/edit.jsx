@@ -1,10 +1,10 @@
 import { View, StyleSheet } from "react-native";
-import HomePage from "../../../components/HomePage";
+import EditIngredientForm from "../../../../../../components/EditIngredientPage";
 
-export default function HomeScreen() {
+export default function EditIngredientScreen() {
   return (
     <View style={styles.container}>
-      <HomePage />
+      <EditIngredientForm />
     </View>
   );
 }
@@ -13,7 +13,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#25292e",
-    alignItems: "center",
     justifyContent: "center",
+    alignItems: "center",
   },
 });

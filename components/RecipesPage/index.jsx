@@ -3,32 +3,28 @@ import { Link, useFocusEffect } from "expo-router";
 import { StyleSheet, FlatList, Text, View, Dimensions } from "react-native";
 import RecipeListItem from "./RecipeListItem";
 import recipeService from "../../services/recipes";
-import AddButton from "../AddButton";
-import AddRecipeForm from "./AddRecipeForm";
-import ModalComponent from "../ModalComponent";
 import { useAuthSession } from "../../hooks/AuthProvider";
+import Button from "../Button";
 
 export default function RecipesPage() {
   const [recipes, setRecipes] = useState([]);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [error, setError] = useState(null);
   const [isFetching, setIsFetching] = useState(false);
   const { userId } = useAuthSession();
 
-  const getRecipes = async () => {
+  const getRecipes = useCallback(async () => {
     const recipes = await recipeService.getRecipesByUser(userId.current);
     setRecipes(recipes);
     setIsFetching(false);
-  };
+  }, [userId]);
 
   useFocusEffect(
     useCallback(() => {
       getRecipes();
-    }, [])
+    }, [getRecipes])
   );
 
   const handleEmptyList = () => {
-    return <Text>No recipes found!</Text>;
+    return <Text style={{ alignSelf: "center" }}>No recipes found!</Text>;
   };
 
   const onRefresh = () => {
@@ -48,28 +44,8 @@ export default function RecipesPage() {
     </View>
   );
 
-  const onAddRecipe = () => {
-    setIsModalVisible(true);
-  };
-
-  const onModalClose = () => {
-    setIsModalVisible(false);
-  };
-
-  const submitNewRecipe = async (values) => {
-    try {
-      const recipe = await recipeService.createNewRecipe(values, userId.current);
-      setRecipes(recipes.concat(recipe));
-      onModalClose();
-    } catch (err) {
-      console.error(err);
-      setError("Error submitting new recipe");
-    }
-  };
-
   return (
     <View style={styles.container}>
-      {error && <Text style={styles.errorText}>{error}</Text>}
       <FlatList
         ListEmptyComponent={handleEmptyList}
         showsVerticalScrollIndicator={true}
@@ -81,37 +57,30 @@ export default function RecipesPage() {
         refreshing={isFetching}
         ItemSeparatorComponent={<View style={styles.separator}></View>}
       />
-      <View /* style={styles.addButtonViewContainer} */>
-        <AddButton onPress={onAddRecipe} />
+      <View style={styles.addButtonContainer}>
+        <Link
+          href={{
+            pathname: "recipes/add"
+          }}
+          asChild
+        >
+          <Button label="Add a recipe" theme="primary-icon-wide" icon="add" />
+        </Link>
       </View>
-      <ModalComponent isVisible={isModalVisible} onClose={onModalClose} title="Add recipe">
-        <AddRecipeForm onClose={onModalClose} onSubmit={submitNewRecipe} />
-      </ModalComponent>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   listContainer: {
-    borderRadius: 10,
-    //padding: 6,
-    alignItems: "center",
-    justifyContent: "space-between",
+    //borderRadius: 10,
     backgroundColor: "#fff",
     flexDirection: "column",
-    margin: 10
+    width: Dimensions.get("window").width * 0.9,
   },
-  addButton: {
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    padding: 10,
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  addButtonViewContainer: {
-    position: "absolute",
-    left: -150,
-    bottom: 20
+  addButtonContainer: {
+    width: Dimensions.get("window").width * 0.95,
+    alignItems: "center"
   },
   errorText: {
     color: "red"
@@ -121,15 +90,11 @@ const styles = StyleSheet.create({
     backgroundColor: "gray",
   },
   listItemContainer: {
-    //backgroundColor: "gray",
-    width: Dimensions.get("window").width * 0.8,
-    paddingVertical: 4,
-    alignItems: "center",
-    justifyContent: "center",
+    paddingVertical: 2,
   },
   container: {
-    //height: Dimensions.get("window").height * 0.8,
-    //width: Dimensions.get("window").width * 0.8,
-    //flex: 1,
+    justifyContent: "flex-start",
+    alignItems: "center",
+    flex: 1,
   }
 });

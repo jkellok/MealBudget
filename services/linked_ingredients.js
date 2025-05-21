@@ -12,7 +12,7 @@ const getLinkedIngredientsByRecipe = async (id) => {
 };
 
 const getOneLinkedIngredientCostPerKg = async (recipeId, ingredientId) => {
-  const { data } = await axios.get(`${apiBaseUrl}/linked_ingredients/${recipeId}/ingredient/${ingredientId}`);
+  const { data } = await axios.get(`${apiBaseUrl}/linked_ingredients/${recipeId}/ingredient/${ingredientId}/cost`);
   return data;
 };
 
@@ -38,7 +38,6 @@ const updateLinkedIngredient = async (recipeId, object) => {
 
 const updateIngredientCost = async (recipeId, ingredientId, object) => {
   const { data } = await axios.put(`${apiBaseUrl}/linked_ingredients/${recipeId}/ingredient/${ingredientId}`, object);
-
   return data;
 };
 

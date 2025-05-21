@@ -3,7 +3,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 export default function ModalComponent({ isVisible, children, onClose, title }) {
   return (
-    <View style={styles.modalContainer}>
+    <View>
       <Modal animationType="slide" transparent={true} visible={isVisible}>
         <View style={styles.modalContent}>
           <View style={styles.titleContainer}>
@@ -12,7 +12,7 @@ export default function ModalComponent({ isVisible, children, onClose, title }) 
               <MaterialIcons name="close" color="#fff" size={22} />
             </Pressable>
           </View>
-          <ScrollView style={styles.modalChildrenContent}>
+          <ScrollView>
             {children}
           </ScrollView>
         </View>
@@ -26,10 +26,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#eee",
     borderRadius: 18,
     alignSelf: "center",
-    //width: Dimensions.get("window").width * 0.85,
-    //height: Dimensions.get("window").height * 0.9,
+    justifyContent: "center",
+    width: Dimensions.get("window").width * 0.9,
+    height: Dimensions.get("window").height * 0.9,
     paddingBottom: 8,
-    flex: 1,
     marginVertical: 10,
   },
   titleContainer: {
@@ -45,9 +45,5 @@ const styles = StyleSheet.create({
   title: {
     color: "#fff",
     fontSize: 16,
-  },
-  modalContainer: {
-  },
-  modalChildrenContent: {
   },
 });

@@ -5,11 +5,9 @@ import { Text } from "react-native";
 
 export default function AuthLayout() {
   const { token, isLoading } = useAuthSession();
-  console.log("token is", token);
-  console.log("isLoading is", isLoading);
 
   if (isLoading) {
-    return <Text>Loading...</Text>;
+    return <Text style={{ alignSelf: "center", justifyContent: "center" }}>Loading...</Text>;
   }
 
   if (!token?.current) {

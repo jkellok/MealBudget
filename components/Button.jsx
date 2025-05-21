@@ -1,7 +1,8 @@
 import { StyleSheet, View, Pressable, Text } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { forwardRef } from "react";
 
-export default function Button({ label, theme, onPress, icon }) {
+const Button = forwardRef(function Button({ label, theme, onPress, icon }, ref) {
   if (theme === "primary") {
     return (
       <View
@@ -10,8 +11,13 @@ export default function Button({ label, theme, onPress, icon }) {
           { borderWidth: 4, borderColor: "ffd33d", borderRadius: 10 },
         ]}>
         <Pressable
-          style={[styles.button, { backgroundColor: "#fff" }]}
-          onPress={onPress}>
+          style={({ pressed }) => [
+            styles.button, { backgroundColor: "#fff" },
+            pressed ? { backgroundColor: "#d4d4d4" } : {},
+          ]}
+          onPress={onPress}
+          ref={ref}
+        >
           <Text style={[styles.buttonLabel, { color: "#25292e" }]}>{label}</Text>
         </Pressable>
       </View>
@@ -26,8 +32,13 @@ export default function Button({ label, theme, onPress, icon }) {
           { borderWidth: 4, borderColor: "ffd33d", borderRadius: 10 },
         ]}>
         <Pressable
-          style={[styles.button, { backgroundColor: "#fff" }]}
-          onPress={onPress}>
+          style={({ pressed }) => [
+            styles.button, { backgroundColor: "#fff" },
+            pressed ? { backgroundColor: "#d4d4d4" } : {},
+          ]}
+          onPress={onPress}
+          ref={ref}
+        >
           <MaterialIcons name={icon} size={24} color="#25292e" style={styles.buttonIcon} />
           <Text style={[styles.buttonLabel, { color: "#25292e" }]}>{label}</Text>
         </Pressable>
@@ -39,7 +50,14 @@ export default function Button({ label, theme, onPress, icon }) {
     return (
       <View
         style={styles.buttonContainer}>
-        <Pressable style={styles.button} onPress={onPress}>
+        <Pressable
+          style={({ pressed }) => [
+            styles.button,
+            pressed ? { backgroundColor: "#454545" } : {},
+          ]}
+          onPress={onPress}
+          ref={ref}
+        >
           <MaterialIcons name={icon} size={24} color="#fff" style={styles.buttonIcon} />
           <Text style={styles.buttonLabel}>{label}</Text>
         </Pressable>
@@ -47,14 +65,46 @@ export default function Button({ label, theme, onPress, icon }) {
     );
   }
 
+  if (theme === "primary-icon-wide") {
+    return (
+      <View
+        style={[
+          styles.buttonContainer,
+          { borderWidth: 4, borderColor: "ffd33d", borderRadius: 10, width: "100%" },
+        ]}
+      >
+        <Pressable
+          style={({ pressed }) => [
+            styles.button, { backgroundColor: "#fff" },
+            pressed ? { backgroundColor: "#d4d4d4" } : {},
+          ]}
+          onPress={onPress}
+          ref={ref}
+          >
+          <MaterialIcons name={icon} size={24} color="#25292e" style={styles.buttonIcon} />
+          <Text style={[styles.buttonLabel, { color: "#25292e" }]}>{label}</Text>
+        </Pressable>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.buttonContainer}>
-      <Pressable style={styles.button} onPress={onPress}>
+      <Pressable
+        style={({ pressed }) => [
+          styles.button,
+          pressed ? { backgroundColor: "#454545" } : {},
+        ]}
+        onPress={onPress}
+        ref={ref}
+      >
         <Text style={styles.buttonLabel}>{label}</Text>
       </Pressable>
     </View>
   );
-}
+});
+
+export default Button;
 
 // https://docs.expo.dev/tutorial/build-a-screen/
 // for different button styles
@@ -83,5 +133,5 @@ const styles = StyleSheet.create({
   buttonLabel: {
     color: "#fff",
     fontSize: 16,
-  },
+  }
 });

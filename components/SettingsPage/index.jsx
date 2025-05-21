@@ -1,4 +1,4 @@
-import { StyleSheet, View, Alert } from "react-native";
+import { StyleSheet, View, Alert, Dimensions } from "react-native";
 import { useAuthSession } from "../../hooks/AuthProvider";
 import Button from "../Button";
 import usersService from "../../services/users";
@@ -30,7 +30,6 @@ export default function SettingsPage() {
   };
 
   const deleteAccount = async () => {
-    console.log("deleting account, userid", userId);
     try {
       const deletedUser = await usersService.deleteUser(userId);
       if (deletedUser) {
@@ -52,11 +51,11 @@ export default function SettingsPage() {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "#fff",
-    justifyContent: "space-around",
+    justifyContent: "space-evenly",
     alignItems: "center",
-    //flex: 1,
     padding: 10,
-    height: 300,
-    borderRadius: 5,
+    borderRadius: 10,
+    width: Dimensions.get("window").width * 0.9,
+    height: Dimensions.get("window").height * 0.8,
   },
 });

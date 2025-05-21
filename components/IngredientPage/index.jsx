@@ -1,11 +1,9 @@
-import { useEffect, useState } from "react";
-import { StyleSheet, Text, View, FlatList } from "react-native";
+import { useState, useCallback } from "react";
+import { StyleSheet, Text, View, ScrollView, Alert } from "react-native";
 import ingredientService from "../../services/ingredients";
 import linkedIngredientService from "../../services/linked_ingredients";
-import ModalComponent from "../ModalComponent";
-import { router, Stack, useLocalSearchParams, Link } from "expo-router";
+import { router, Stack, useLocalSearchParams, Link, useFocusEffect } from "expo-router";
 import Button from "../Button";
-import EditIngredientForm from "./EditIngredientForm";
 import RecipeListItem from "../RecipesPage/RecipeListItem";
 import { useAuthSession } from "../../hooks/AuthProvider";
 
@@ -15,7 +13,7 @@ const IngredientDetails = ({ ingredient }) => {
       <Text style={styles.detailText}>Name: {ingredient.name}</Text>
       <Text style={styles.detailText}>Amount: {parseFloat(ingredient.amount)} {ingredient.unit}</Text>
       <Text style={styles.detailText}>Cost per kg: {ingredient.cost_per_kg} €/kg</Text>
-      {ingredient.cost_per_unit && <Text style={styles.detailText}>Cost per unit: {ingredient.cost_per_unit} €</Text>}
+      {ingredient.cost_per_package && <Text style={styles.detailText}>Cost per unit: {ingredient.cost_per_package} €</Text>}
       {ingredient.expiration_date && <Text style={styles.detailText}>Expiration date: {new Date(ingredient.expiration_date).toLocaleDateString()}</Text>}
       {ingredient.buy_date && <Text style={styles.detailText}>Buy date: {new Date(ingredient.buy_date).toLocaleDateString()}</Text>}
       {ingredient.aisle && <Text style={styles.detailText}>Aisle: {ingredient.aisle}</Text>}
@@ -27,39 +25,29 @@ const IngredientDetails = ({ ingredient }) => {
   );
 };
 
-const LinkedRecipes = ({ linkedRecipes }) => {
-  const renderRecipeTitle = ({ item }) => (
+const RecipeTitle = ({ recipe }) => {
+  return (
     <View>
       <Link
         href={{
           pathname: "recipes/recipe/[id]",
-          params: { id: item.recipe_id },
-        }}>
-        <Text>{"\u2022 "}<Text style={styles.linkText}>{item.title}</Text></Text>
+          params: { id: recipe.recipe_id },
+        }}
+        withAnchor // ensure back button exists on recipe
+      >
+        <Text>{"\u2022 "}<Text style={styles.linkText}>{recipe.title}</Text></Text>
+        {/* Could make RecipeListItemSimple to show small picture and less details but more than just a title */}
+        {/* <RecipeListItem item={item} /> */}
       </Link>
     </View>
   );
+};
 
-  // if want to show image or possibly other details instead
-  const renderItem = ({ item }) => (
-    <View style={styles.listItemContainer}>
-      <Link
-        href={{
-          pathname: "recipes/recipe/[id]",
-          params: { id: item.recipe_id },
-        }}>
-        <RecipeListItem item={item} />
-      </Link>
-    </View>
-  );
-
+const LinkedRecipes = ({ linkedRecipes }) => {
   return (
     <View style={styles.textContainer}>
       <Text>This ingredient is used in recipes:</Text>
-      <FlatList
-        data={linkedRecipes}
-        renderItem={renderRecipeTitle}
-      />
+      {linkedRecipes.map(r => (<RecipeTitle recipe={r} key={r.recipe_id} />))}
     </View>
   );
 };
@@ -67,52 +55,54 @@ const LinkedRecipes = ({ linkedRecipes }) => {
 export default function IngredientPage() {
   const { id } = useLocalSearchParams();
   const [ingredient, setIngredient] = useState([]);
-  const [isModalVisible, setIsModalVisible] = useState(false);
   const [error, setError] = useState(null);
   const [linkedRecipes, setLinkedRecipes] = useState([]);
   const { userId } = useAuthSession();
 
-  const getIngredient = async (id) => {
+  const getIngredient = useCallback(async (id) => {
     const ingredient = await ingredientService.getIngredient(id, userId.current);
     setIngredient(ingredient);
-  };
+  }, [userId]);
 
   const getLinkedRecipes = async (id) => {
     const linkedRecipes = await linkedIngredientService.getLinkedRecipesByIngredient(id);
     setLinkedRecipes(linkedRecipes);
   };
 
-  useEffect(() => {
-    getIngredient(id);
-    getLinkedRecipes(id);
-  }, [id]);
+  useFocusEffect(
+    useCallback(() => {
+      getIngredient(id);
+      getLinkedRecipes(id);
+      return () => {
+        getIngredient(id);
+        getLinkedRecipes(id);
+      };
+    }, [getIngredient, id])
+  );
 
-  const onDelete = async () => {
+  const onDelete = () => {
+    Alert.alert("Delete ingredient",
+      "Are you sure you want to delete this ingredient?", [
+      {
+        text: "Cancel",
+        onPress: () => console.log("Deletion cancelled!"),
+      },
+      {
+        text: "OK",
+        onPress: () => handleDeletion()
+      },
+    ], {
+      cancelable: true
+    });
+  };
+
+  const handleDeletion = async () => {
     try {
       await ingredientService.deleteIngredient(id, userId.current);
-      router.back();
+      router.dismiss();
     } catch (err) {
       console.error(err);
       setError("Error while deleting ingredient.");
-    }
-  };
-
-  const onUpdateIngredient = () => {
-    setIsModalVisible(true);
-  };
-
-  const onModalClose = () => {
-    setIsModalVisible(false);
-  };
-
-  const submitUpdatedIngredient = async (values) => {
-    try {
-      const updatedIngredient = await ingredientService.updateIngredient(values, ingredient.ingredient_id, userId.current);
-      setIngredient(updatedIngredient);
-      onModalClose();
-    } catch (err) {
-      console.error(err);
-      setError("Error editing the ingredient");
     }
   };
 
@@ -125,15 +115,23 @@ export default function IngredientPage() {
         }}
       />
       {error && <Text style={styles.errorText}>{error}</Text>}
-      <IngredientDetails ingredient={ingredient} />
-      {linkedRecipes.length > 0 && <LinkedRecipes linkedRecipes={linkedRecipes} />}
+      <ScrollView>
+        <IngredientDetails ingredient={ingredient} />
+        {linkedRecipes.length > 0 && <LinkedRecipes linkedRecipes={linkedRecipes} />}
+      </ScrollView>
+
       <View style={styles.buttonContainer}>
-        <Button label="Edit" onPress={onUpdateIngredient} theme="primary-icon" icon="edit" />
+        <Link
+          href={{
+            pathname: "pantry/ingredient/[id]/edit",
+            params: { id: id }
+          }}
+          asChild
+        >
+          <Button label="Edit" theme="primary-icon" icon="edit" />
+        </Link>
         <Button label="Delete" onPress={onDelete} theme="secondary-icon" icon="delete" />
       </View>
-      <ModalComponent isVisible={isModalVisible} onClose={onModalClose} title="Edit ingredient">
-        <EditIngredientForm onClose={onModalClose} onSubmit={submitUpdatedIngredient} ingredient={ingredient} />
-      </ModalComponent>
     </View>
   );
 }
@@ -143,7 +141,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     width: "100%",
     height: "100%",
-    padding: 10,
+    padding: 8,
   },
   errorText: {
     color: "red"
@@ -151,8 +149,6 @@ const styles = StyleSheet.create({
   buttonContainer: {
     marginTop: 10,
     flexDirection: "row",
-    position: "absolute",
-    bottom: 30,
     alignSelf: "center",
   },
   textContainer: {
@@ -160,7 +156,6 @@ const styles = StyleSheet.create({
   },
   detailText: {
     fontSize: 20,
-    //textAlign: "center"
     userSelect: "auto"
   },
   linkText: {

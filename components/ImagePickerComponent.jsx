@@ -18,7 +18,7 @@ export default function ImagePickerComponent({ handleSelectedImage, showField, d
     }
   }, [defaultImage]);
 
-  // haven't tested this
+  // haven't tested permissions properly
   if (cameraPermission?.status !== ImagePicker.PermissionStatus.GRANTED) {
     return (
       <View style={styles.container}>

@@ -228,12 +228,12 @@ const EditForm = ({ defaultValues, onSubmit, onCancel, error }) => {
             </View>
 
             <View>
-              <Text>Cost per package</Text>
+              <Text>Cost per pkg</Text>
               <Controller
                 control={control}
                 render={({ field: { onChange, onBlur, value } }) => (
                   <TextInput
-                    placeholder="Cost per package"
+                    placeholder="Cost per pkg"
                     onBlur={onBlur}
                     onChangeText={onChange}
                     value={value}

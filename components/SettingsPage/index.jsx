@@ -31,7 +31,7 @@ export default function SettingsPage() {
 
   const deleteAccount = async () => {
     try {
-      const deletedUser = await usersService.deleteUser(userId);
+      const deletedUser = await usersService.deleteUser(userId.current);
       if (deletedUser) {
         signOut();
       }

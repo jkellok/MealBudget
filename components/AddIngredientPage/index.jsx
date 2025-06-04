@@ -236,12 +236,12 @@ export default function AddIngredientForm() {
             </View>
 
             <View>
-              <Text>Cost per package</Text>
+              <Text>Cost per pkg</Text>
               <Controller
                 control={control}
                 render={({ field: { onChange, onBlur, value } }) => (
                   <TextInput
-                    placeholder="Cost per package"
+                    placeholder="Cost per pkg"
                     onBlur={onBlur}
                     onChangeText={onChange}
                     value={value}
@@ -405,7 +405,7 @@ export default function AddIngredientForm() {
             control={control}
             render={({ field: { onChange, onBlur, value } }) => (
               <TextInput
-                placeholder="Weight per piece (g))"
+                placeholder="Weight per piece (g)"
                 onBlur={onBlur}
                 onChangeText={onChange}
                 value={value}

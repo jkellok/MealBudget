@@ -2,6 +2,13 @@
 
 Backend at https://github.com/jkellok/MealBudget-backend/
 
+# Demo video
+
+[![Demo Video](https://img.youtube.com/vi/b4Fu2mwhfs0/0.jpg)](https://www.youtube.com/watch?v=b4Fu2mwhfs0)
+
+
+---
+
 # Welcome to your Expo app 👋
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
